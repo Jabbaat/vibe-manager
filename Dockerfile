@@ -1,20 +1,11 @@
-FROM python:3.11-slim
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# We voegen google-cloud-firestore toe aan de lijst
-RUN pip install --no-cache-dir --upgrade \
-    fastapi \
-    uvicorn[standard] \
-    pydantic \
-    python-dotenv \
-    google-genai \
-    python-multipart \
-    python-docx \
-    pandas \
-    openpyxl \
-    google-cloud-firestore
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY test_agent.py .
+COPY . .
 
-CMD ["uvicorn", "test_agent:app", "--host", "0.0.0.0", "--port", "8080"]
+# Start main.py
+CMD exec uvicorn main:app --host 0.0.0.0 --port $PORT
