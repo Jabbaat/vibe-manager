@@ -116,11 +116,10 @@ def get_bitcoin_price():
 def home(): 
     return html_content
 
-# --- DE AUTO-PILOT ROUTE (NIEUW!) ---
+# --- DE AUTO-PILOT ROUTE (V11 - THE ULTIMATE MORNING EDITION) ---
 @app.get("/cron/daily_news")
 def trigger_daily_news(token: str = ""):
     """Dit is de onzichtbare knop die de Cloud Scheduler elke ochtend indrukt."""
-    # Simpele beveiliging: de token in de URL moet gelijk zijn aan je wachtwoord
     if token != ADMIN_PASSWORD:
         return {"error": "Toegang geweigerd. Verkeerde token."}
         
@@ -128,15 +127,23 @@ def trigger_daily_news(token: str = ""):
         btc_prijs = get_bitcoin_price()
         client = genai.Client(api_key=API_KEY)
         
+        # De gigantische, alles-in-één prompt voor de AI
         prompt = f"""
-        Maak een vette, Neobrutalistische dagelijkse briefing. 
-        Zoek met Google Search naar de 3 belangrijkste nieuwtjes over AI van de afgelopen 24 uur.
-        De huidige Bitcoin prijs is: {btc_prijs}.
+        Maak een vette, Neobrutalistische dagelijkse briefing als HTML e-mail. 
         
-        Format het als een mooie HTML email:
-        Gebruik <h2>, <ul>, <li>, <b> en <br>.
-        Maak het enthousiast, direct en to the point!
-        Begin de email met een knallende begroeting voor Eddie en de huidige BTC prijs.
+        JOUW OPDRACHT - Zoek met Google Search naar de volgende actuele informatie:
+        1. 🌤️ WEER: De gedetailleerde weersverwachting voor vandaag in Uden.
+        2. 🌍 WERELDNIEUWS: De 3 belangrijkste internationale nieuwsberichten van de afgelopen 24 uur.
+        3. 🇳🇱 BINNENLANDS NIEUWS: De 3 belangrijkste nationale nieuwsberichten uit Nederland van vandaag.
+        4. 🤖 AI NIEUWS: De 3 vetste en meest impactvolle nieuwtjes over Artificial Intelligence.
+        5. 💰 BITCOIN: De huidige Bitcoin prijs is: {btc_prijs}. Zet deze prijs prominent bovenaan!
+        6. 🍿 KIJKTIPS: Geef 1 absolute toptip voor een film en 1 toptip voor een serie. Kies UITSLUITEND producties die extreem goed gewaardeerd worden (bijv. hoge IMDb of Rotten Tomatoes scores). Geef een ultrakorte, pakkende pitch waarom Eddie dit móét zien.
+        
+        STRIKTE REGELS VOOR DE OUTPUT:
+        - Geef UITSLUITEND de rauwe HTML code terug. Geen inleiding, geen "Hier is je mail", en geen uitleg achteraf.
+        - GEEN markdown blokken (gebruik geen ```html of ```).
+        - Gebruik inline CSS voor de Neobrutalist stijl: zwarte achtergrond (#000000), monospace lettertype ('Courier New', monospace), dikke borders, en felle neon kleuren (groen #ccff00, roze #ff90e8, cyaan #00ffff, geel #ffff00) voor de verschillende categorieën.
+        - Maak het enthousiast, direct en to the point! Begin met een knallende begroeting voor Eddie.
         """
         
         response = client.models.generate_content(
@@ -146,12 +153,21 @@ def trigger_daily_news(token: str = ""):
                 tools=[types.Tool(google_search=types.GoogleSearch())],
             )
         )
-        nieuws_html = response.text
+        
+        # Schoonmaak-filter
+        nieuws_html = response.text.strip()
+        if nieuws_html.startswith("```html"):
+            nieuws_html = nieuws_html[7:]
+        elif nieuws_html.startswith("```"):
+            nieuws_html = nieuws_html[3:]
+        if nieuws_html.endswith("```"):
+            nieuws_html = nieuws_html[:-3]
+        nieuws_html = nieuws_html.strip()
         
         # Stuur de mail!
-        status = stuur_email("🚀 Jouw Dagelijkse AI & Crypto Briefing", nieuws_html)
+        status = stuur_email("🚀 Jouw Ultieme Ochtend Briefing (Nieuws, Weer, AI & Kijktips)", nieuws_html)
         
-        return {"status": status, "preview": "Briefing is gegenereerd en het mail-commando is uitgevoerd."}
+        return {"status": status, "preview": "Mega Briefing inclusief weer en kijktips is succesvol gegenereerd en verzonden!"}
     except Exception as e:
         return {"error": str(e)}
 
