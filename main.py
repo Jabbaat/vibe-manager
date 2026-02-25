@@ -127,24 +127,30 @@ def trigger_daily_news(token: str = ""):
         btc_prijs = get_bitcoin_price()
         client = genai.Client(api_key=API_KEY)
         
-        # De gigantische, alles-in-één prompt voor de AI
+# De sterk gepersonaliseerde 'Roadmap' prompt met focus op Eddie's smaak en carrière
         prompt = f"""
-        Maak een vette, Neobrutalistische dagelijkse briefing als HTML e-mail. 
+        Maak een HTML e-mail briefing in een visuele 'Whiteboard / Roadmap' stijl.
         
-        JOUW OPDRACHT - Zoek met Google Search naar de volgende actuele informatie:
-        1. 🌤️ WEER: De gedetailleerde weersverwachting voor vandaag in Uden.
-        2. 🌍 WERELDNIEUWS: De 3 belangrijkste internationale nieuwsberichten van de afgelopen 24 uur.
-        3. 🇳🇱 BINNENLANDS NIEUWS: De 3 belangrijkste nationale nieuwsberichten uit Nederland van vandaag.
-        4. 🤖 AI NIEUWS: De 3 vetste en meest impactvolle nieuwtjes over Artificial Intelligence.
-        5. 💰 BITCOIN: De huidige Bitcoin prijs is: {btc_prijs}. Zet deze prijs prominent bovenaan!
-        6. 🍿 KIJKTIPS: Geef 1 absolute toptip voor een film en 1 toptip voor een serie. Kies UITSLUITEND producties die extreem goed gewaardeerd worden (bijv. hoge IMDb of Rotten Tomatoes scores). Geef een ultrakorte, pakkende pitch waarom Eddie dit móét zien.
+        JOUW OPDRACHT - Zoek super efficiënt (om overbelasting te voorkomen) naar deze info:
+        1. 🌤️ WEER & 💰 CRYPTO: Kort het weer in Uden vandaag. Huidige BTC prijs is: {btc_prijs}.
+        2. 🌍 NIEUWS: De 2 belangrijkste Wereld headlines en 2 Binnenland (NL) headlines.
+        3. 🤖 AI NIEUWS: 2 impactvolle actuele AI headlines.
+        4. 🎸 JOUW GIGS: Zoek naar actuele concerten in de genres Grunge (denk Nirvana/Smashing Pumpkins), Irish Punk (denk The Pogues), Ska, of Reggae. Kijk specifiek met Google of er iets op de agenda staat bij: De Pul (Uden), Doornroosje (Nijmegen), Willem Twee (Den Bosch), Effenaar (Eindhoven) of Mezz (Breda). Geef max 2 echte tips (verzin niks!).
+        5. 💼 VACATURES (HOOFDFOCUS): Jij bent een AI-carrière expert. Zoek specifieke vacatures voor een "Responsible AI Steward" (of AI Ethics, AI compliance, ethische AI implementatie) binnen maximaal 45 min van Uden (driehoek Eindhoven, Den Bosch, Nijmegen). 
+           Gebruik in je zoekopdracht: site:nl.indeed.com OR site:linkedin.com/jobs OR site:aicarriere.nl. 
+           Geef maximaal 3 perfect passende vacatures met een korte pitch én VERPLICHT de directe, werkende URL naar de vacature.
         
-        STRIKTE REGELS VOOR DE OUTPUT:
-        - Geef UITSLUITEND de rauwe HTML code terug. Geen inleiding, geen "Hier is je mail", en geen uitleg achteraf.
-        - GEEN markdown blokken (gebruik geen ```html of ```).
-        - Gebruik inline CSS voor de Neobrutalist stijl: zwarte achtergrond (#000000), monospace lettertype ('Courier New', monospace), dikke borders, en felle neon kleuren (groen #ccff00, roze #ff90e8, cyaan #00ffff, geel #ffff00) voor de verschillende categorieën.
-        - Maak het enthousiast, direct en to the point! Begin met een knallende begroeting voor Eddie.
+        STRIKTE HTML/CSS REGELS VOOR DE VISUELE OPMAAK:
+        - Geef UITSLUITEND de rauwe HTML code terug. Geen markdown (geen ```html of ```).
+        - Plaats ELK van de 5 onderwerpen in een eigen <div> kader.
+        - Gebruik inline CSS om een handgetekende roadmap/whiteboard na te bootsen:
+          * Achtergrond van de hele mail: heel lichtgrijs (#f4f4f9).
+          * Lettertype: Een robuust, speels sans-serif font zoals 'Comic Sans MS', Arial, of 'Trebuchet MS'. Zwarte tekst (#000).
+          * De Kaders (divs): Geef ze dikke afgeronde randen en een 'harde' schaduw (border: 4px solid #000; border-radius: 15px; padding: 15px; margin-bottom: 25px; box-shadow: 6px 6px 0px #000;).
+          * Wissel de achtergrondkleur per kader af: lichtblauw (#e3f2fd), lichtgroen (#e8f5e9), lichtroze (#fce4ec).
+          * Maak het Vacature-kader lichtgeel (#fff59d) en het Gigs-kader lichtoranje (#ffe0b2)!
         """
+
         
         response = client.models.generate_content(
             model='gemini-2.0-flash',
